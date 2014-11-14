@@ -1,0 +1,111 @@
+package ${targetPackage};
+
+import oracle.jdbc.OracleTypes;
+import oracle.jdbc.OracleCallableStatement;
+
+import oracle.sql.ARRAY;
+import oracle.sql.STRUCT;
+
+import ${modelPackage}.*;
+import ${converterPackage}.*;
+import ${utilPackage}.StoredProcedure;
+
+import java.sql.Connection;
+import java.sql.Timestamp;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+/**
+* Generated class by plsql-from-java-maven-plugin.
+*
+* ${procedureName} ${procedure.methodType}
+*/
+public class ${className} implements StoredProcedure {
+
+#foreach ( $attr in $par )
+  private ${attr.javaDataType} ${attr.javaPropertyName};
+#end
+
+#foreach ( $attr in $par )
+  public ${attr.javaDataType} get${attr.javaPropertyNameBig}() {
+    return ${attr.javaPropertyName};
+  }
+
+#if($attr.inParam)
+  public void set${attr.javaPropertyNameBig}(${attr.javaDataType} ${attr.javaPropertyName}) {
+    this.${attr.javaPropertyName} = ${attr.javaPropertyName};
+  }
+  
+  public ${className} p_${attr.javaPropertyName}(${attr.javaDataType} ${attr.javaPropertyName}) {
+	set${attr.javaPropertyNameBig}(${attr.javaPropertyName});
+	return this;
+  }
+  
+#end
+#end
+
+  public String getCallStatement() {
+    return "{ CALL #if(${procedure.methodType} eq "FUNCTION")? = #end${procedure.objectName}.${procedure.procedureName} ("
+#set($cnt=0)
+#foreach ( $attr in $par )
+#if( ($attr.argumentName) )
+#if($cnt == 0)
+                   + " ${attr.argumentName} => ?"
+#else
+                   + ",${attr.argumentName} => ?"
+#end
+#set($cnt=$cnt+1)
+#end
+#end                   + ") }";
+  }
+
+  public void setInputRegisterOutput(OracleCallableStatement ocs) throws SQLException {
+    Connection conn = ocs.getConnection();
+    // IN parameters
+#foreach ( $attr in $par )
+#if($attr.inParam)
+#if($attr.dataType == "OBJECT")
+    ocs.setObject(${attr.sequence}, ${attr.javaDataType}Converter.getSTRUCT(this.get${attr.javaPropertyNameBig}(), conn)); // ${attr.argumentName}
+#elseif($attr.dataType == "TABLE")
+    ocs.setObject(${attr.sequence}, ${attr.underlyingTypeName}Converter.getListARRAY(this.get${attr.javaPropertyNameBig}(), conn)); // ${attr.argumentName}
+#elseif($attr.javaDataType == "Integer")
+    ocs.setInt(${attr.sequence}, this.get${attr.javaPropertyNameBig}()); // ${attr.argumentName}
+#else
+    ocs.set${attr.javaDataType}(${attr.sequence}, this.get${attr.javaPropertyNameBig}()); // ${attr.argumentName}
+#end
+#end
+#end
+
+    // OUT parameters
+#foreach ( $attr in $par )
+#if($attr.outParam)
+#if($attr.dataType == "OBJECT" || $attr.dataType == "TABLE")
+    ocs.registerOutParameter(${attr.sequence}, OracleTypes.${attr.oracleType}, "${attr.typeName}"); // ${attr.argumentName}
+#else
+    ocs.registerOutParameter(${attr.sequence}, OracleTypes.${attr.oracleType}); // ${attr.argumentName}
+#end
+#end
+#end
+  }
+
+  public void setResults(OracleCallableStatement ocs) throws SQLException {
+#foreach ( $attr in $par )
+#if($attr.outParam)
+#if($attr.dataType == "OBJECT")
+    this.${attr.javaPropertyName} = ${attr.javaDataType}Converter.getObject((STRUCT)ocs.getObject(${attr.sequence})); // ${attr.argumentName}
+#elseif($attr.dataType == "TABLE")
+    this.${attr.javaPropertyName} = ${attr.underlyingTypeName}Converter.getObjectList((ARRAY)ocs.getObject(${attr.sequence})); // ${attr.argumentName}
+#elseif($attr.javaDataType == "Integer")
+        this.${attr.javaPropertyName} = ocs.getInt(${attr.sequence}); // ${attr.argumentName}
+#else
+    this.${attr.javaPropertyName} = ocs.get${attr.javaDataType}(${attr.sequence}); // ${attr.argumentName}
+#end
+#end
+#end
+  }
+
+}

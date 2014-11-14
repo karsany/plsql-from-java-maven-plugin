@@ -1,0 +1,42 @@
+package ${targetPackage};
+
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.List;
+
+/**
+* Generated class by  plsql-from-java-maven-plugin
+*/
+public class ${className} {
+
+#foreach ( $attr in $attrList )
+  private ${attr.javaDataType} ${attr.javaPropertyName}; // ${attr.attrName}
+#end
+
+  public ${className}() {
+  }
+
+  public ${className}(#foreach( $attr in $attrList )#if ($velocityCount > 1), #else#end${attr.javaDataType} ${attr.javaPropertyName}#end) {
+#foreach ( $attr in $attrList )
+    this.${attr.javaPropertyName} = ${attr.javaPropertyName};
+#end
+  }
+
+#foreach ( $attr in $attrList )
+  public ${attr.javaDataType} get${attr.javaPropertyNameBig}() {
+    return this.${attr.javaPropertyName};
+  }
+  public void set${attr.javaPropertyNameBig}(${attr.javaDataType} ${attr.javaPropertyName}) {
+    this.${attr.javaPropertyName} = ${attr.javaPropertyName};
+  }
+
+#end
+
+  public void refreshObject(${className} o) {
+#foreach ( $attr in $attrList )
+    this.${attr.javaPropertyName} = o.get${attr.javaPropertyNameBig}();
+#end
+  }
+
+
+}

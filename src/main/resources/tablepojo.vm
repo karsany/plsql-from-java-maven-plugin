@@ -1,0 +1,88 @@
+package ${targetPackage};
+
+#if ( $genSpringHelper == "true" )
+import org.springframework.jdbc.core.RowMapper;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+#end
+import java.sql.Date;
+import java.sql.Timestamp;
+
+/**
+* Generated class by OracleService generator.
+*/
+public class ${className} {
+
+
+#foreach ( $column in $columnList )
+    private ${column.javaDataType} ${column.javaPropertyName}; // ${column.columnName}
+#end
+
+    public ${className}() {	    
+    }
+
+    public ${className}(
+#foreach ( $column in $columnList )
+        #if ($velocityCount > 1),#else #end${column.javaDataType} ${column.javaPropertyName}
+#end
+    )
+    {
+#foreach ( $column in $columnList )
+        this.${column.javaPropertyName} = ${column.javaPropertyName};
+#end
+    }
+
+#foreach ( $column in $columnList )
+    public ${column.javaDataType} get${column.javaPropertyNameBig}() {
+        return this.${column.javaPropertyName};
+    }
+    public void set${column.javaPropertyNameBig}(${column.javaDataType} ${column.javaPropertyName}) {
+        this.${column.javaPropertyName} = ${column.javaPropertyName};
+    }
+
+#end
+
+#if ( $genSpringHelper == "true" )
+
+    public static RowMapper<${className}> getRowMapper() {
+
+        return new RowMapper<${className}>() {
+            @Override
+            public ${className} mapRow(ResultSet resultSet, int i) throws SQLException {
+            return new ${className} (
+#foreach ( $column in $columnList )
+                    #if ($velocityCount > 1),#else #end resultSet.get${column.resultSetDataType}("${column.columnName}")
+#end
+                );}};
+    }
+
+#end
+
+#if ($genFullSelect == "true")
+
+    public static String getFullSelect(String additionalWhere) {
+
+        return "SELECT " +
+#foreach ( $column in $columnList )
+                    "#if ($velocityCount > 1),#else #end ${column.columnName} " +
+#end
+                "FROM ${tableName}" +
+                 (additionalWhere == null || additionalWhere == "" ? "" : " WHERE " + additionalWhere);
+
+    }
+
+#end
+
+#if ($genSqliteCreateTable == "true")
+
+    public static String getSqliteCreateTable() {
+        return "CREATE TABLE IF NOT EXISTS $tableName ("+
+    #foreach ( $column in $columnList )
+                "#if ($velocityCount > 1),#else #end ${column.columnName} ${column.sqliteDataType} " +
+    #end
+               ")";
+    }
+
+#end
+
+}

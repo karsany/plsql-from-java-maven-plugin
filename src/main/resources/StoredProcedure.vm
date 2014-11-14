@@ -1,0 +1,13 @@
+package ${utilPackage};
+
+import oracle.jdbc.OracleCallableStatement;
+
+import java.sql.SQLException;
+
+public interface StoredProcedure {
+    String getCallStatement();
+
+    void setInputRegisterOutput(OracleCallableStatement ocs) throws SQLException;
+
+    void setResults(OracleCallableStatement ocs) throws SQLException;
+}

@@ -1,0 +1,55 @@
+package ${servicePackage};
+
+import ${modelPackage}.*;
+import ${utilPackage}.DatabaseSessionManager;
+
+#foreach ( $proc in $service )
+import ${procPackage}.${proc.storedProcedureClassName};
+#end
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.util.List;
+
+public class ${className} {
+
+    @Autowired
+    private DataSource dataSource;
+
+#foreach ( $proc in $service )
+    public#if($proc.methodType=="FUNCTION") ${proc.returnJavaType} #else void #end ${proc.javaProcedureName}(
+#foreach( $arg in $proc.argumentList )
+                   #if ($velocityCount != 1),#else #end${arg.javaDataType} ${arg.javaPropertyName} // ${arg.inoutType}
+#end
+    ) throws SQLException {
+        DatabaseSessionManager dsm = new DatabaseSessionManager(dataSource);
+
+        ${proc.storedProcedureClassName} s = (${proc.storedProcedureClassName}) dsm.execute(
+            new ${proc.storedProcedureClassName}()
+#foreach( $arg in $proc.argumentList )#if( $arg.inParam )
+                .p_${arg.javaPropertyName}(${arg.javaPropertyName})
+#end#end            );
+
+#foreach( $arg in $proc.argumentList )
+#if( $arg.outParam )
+#if( $arg.isList() == true )
+        ${arg.javaPropertyName}.clear();
+        ${arg.javaPropertyName}.addAll(s.get${arg.javaPropertyNameBig}());
+#else
+        ${arg.javaPropertyName}.refreshObject(s.get${arg.javaPropertyNameBig}());
+#end
+#end
+#end
+
+        dsm.close();
+
+#if ($proc.methodType == "FUNCTION")
+        return s.get__return();
+#end
+    }
+
+#end
+
+}

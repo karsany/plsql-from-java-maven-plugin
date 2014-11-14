@@ -1,0 +1,91 @@
+package ${utilPackage};
+
+import oracle.jdbc.OracleCallableStatement;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+/**
+ * DatabaseSessionManager helps to manage the database sessions
+ * for calling the StoredProcedures
+ */
+public class DatabaseSessionManager {
+
+    private DataSource dataSource;
+    private Connection connection;
+    private boolean initialized = false;
+    private boolean autoClose = false;
+
+    public DatabaseSessionManager(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public DatabaseSessionManager(DataSource dataSource, boolean autoClose) {
+        this.dataSource = dataSource;
+        this.autoClose = autoClose;
+    }
+
+
+    private void init() throws SQLException {
+        if (!initialized) {
+            this.connection = dataSource.getConnection();
+            initialized = true;
+        }
+    }
+
+    /**
+     * If you want to run your StoredProcedure in new session
+     * call this procedure.
+     * <p/>
+     * This procedure closes the database connection, and forces the
+     * DatabaseSessionManager to connect again at the next call.
+     *
+     * @throws java.sql.SQLException
+     */
+    public void reset() throws SQLException {
+        if (this.connection != null) {
+            this.connection.close();
+        }
+
+        this.connection = null;
+        initialized = false;
+    }
+
+    /**
+    * Closes the session.
+    *
+    * @throws java.sql.SQLException
+    */
+    public void close() throws SQLException {
+        reset();
+    }
+
+
+    /**
+     * Executes a StoredProcedure.
+     *
+     * @param storedProcedure stored procedure to run
+     * @return the same object, after running the stored procedure. You should cast it to the original type
+     * @throws java.sql.SQLException
+     */
+    public StoredProcedure execute(StoredProcedure storedProcedure) throws SQLException {
+        init(); // initiaize is it is not yet (connect to db)
+
+        // call the SP
+        OracleCallableStatement ocs = (OracleCallableStatement) this.connection.prepareCall(storedProcedure.getCallStatement());
+        storedProcedure.setInputRegisterOutput(ocs);
+        ocs.execute();
+        storedProcedure.setResults(ocs);
+        ocs.close();
+
+        if(autoClose) {
+            this.close();
+        }
+
+        // return the sp optionally
+        return storedProcedure;
+    }
+
+
+}

@@ -1,0 +1,124 @@
+package ${targetPackage};
+
+import oracle.sql.*;
+import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
+import ${oracleTypesPackage}.*;
+import java.math.BigDecimal;
+
+/**
+* Generated class by plsql-from-java-maven-plugin.
+*
+* Oracle-JAVA converter for class ${typeName}
+*/
+public final class ${className}Converter {
+
+  private final static String TYPE_NAME      = "${typeName}";
+  private final static String TYPE_NAME_LIST = "${typeName}_LIST";
+
+  private ${className}Converter(){
+  }
+
+  public static STRUCT getSTRUCT(${className} ${smallClassName}, Connection connection) throws SQLException {
+
+    if(${smallClassName} == null) {
+      return null;
+    }
+
+    StructDescriptor structDescriptor = new StructDescriptor(TYPE_NAME, connection);
+    List<Object> struct = new ArrayList<Object>();
+
+#foreach ( $attr in $attrList )
+#if (${attr.typeCode} eq "COLLECTION")
+    struct.add(${attr.attrNoIndex}, ${attr.javaCollectionBaseTypeNameBig}Converter.getListARRAY(${smallClassName}.get${attr.javaPropertyNameBig}(), connection)); // ${attr.attrName}
+#elseif (${attr.typeCode} eq "OBJECT")
+    struct.add(${attr.attrNoIndex}, ${attr.javaDataType}Converter.getSTRUCT(${smallClassName}.get${attr.javaPropertyNameBig}(), connection)); // ${attr.attrName}
+#elseif (${attr.attrTypeName} eq "DATE")
+    struct.add(${attr.attrNoIndex}, new DATE(${smallClassName}.get${attr.javaPropertyNameBig}())); // ${attr.attrName}
+#elseif (${attr.attrTypeName} eq "TIMESTAMP")
+    struct.add(${attr.attrNoIndex}, new TIMESTAMP(${smallClassName}.get${attr.javaPropertyNameBig}())); // ${attr.attrName}
+#elseif (${attr.attrTypeName} eq "CLOB")
+    CLOB cl = CLOB.createTemporary(connection, false, CLOB.DURATION_SESSION); // ${attr.attrName}
+    cl.open(CLOB.MODE_READWRITE); // ${attr.attrName}
+    cl.setString(1, ${smallClassName}.get${attr.javaPropertyNameBig}()); // ${attr.attrName}
+    cl.close(); // ${attr.attrName}
+    struct.add(${attr.attrNoIndex}, cl); // ${attr.attrName}
+#else
+    struct.add(${attr.attrNoIndex}, ${smallClassName}.get${attr.javaPropertyNameBig}()); // ${attr.attrName}
+#end
+#end
+
+    return new STRUCT(structDescriptor, connection, struct.toArray());
+  }
+
+  public static ARRAY getListARRAY(List<${className}> ${smallClassName}List, Connection connection) throws SQLException {
+    ArrayDescriptor arrayDescriptor = new ArrayDescriptor(TYPE_NAME_LIST, connection);
+
+    if(${smallClassName}List == null) {
+      return new ARRAY(arrayDescriptor, connection, new Object[0]);
+    }
+
+
+    List<Object> array = new ArrayList<Object>(${smallClassName}List.size());
+
+    for(${className} o : ${smallClassName}List) {
+      array.add(${className}Converter.getSTRUCT(o, connection));
+    }
+
+    return new ARRAY(arrayDescriptor, connection, array.toArray());
+  }
+
+  public static ${className} getObject(STRUCT struct) throws SQLException {
+
+    if(struct.getAttributes() == null || struct.getAttributes().length == 0) {
+      return null;
+    }
+
+    ${className} result = new ${className}();
+
+    Object[] attr = struct.getAttributes();
+
+#foreach ( $attr in $attrList )
+    if(attr[${attr.attrNoIndex}] != null)
+#if (${attr.typeCode} eq "COLLECTION")
+      result.set${attr.javaPropertyNameBig}(${attr.javaCollectionBaseTypeNameBig}Converter.getObjectList((ARRAY)attr[${attr.attrNoIndex}])); // ${attr.attrName}
+#elseif (${attr.typeCode} eq "OBJECT")
+      result.set${attr.javaPropertyNameBig}(${attr.javaDataType}Converter.getObject((STRUCT)attr[${attr.attrNoIndex}])); // ${attr.attrName}
+#elseif (${attr.attrTypeName} eq "DATE")
+      // result.set${attr.javaPropertyNameBig}(((DATE)attr[${attr.attrNoIndex}]).dateValue()); // ${attr.attrName}
+      result.set${attr.javaPropertyNameBig}((Date)attr[${attr.attrNoIndex}]); // ${attr.attrName}
+#elseif (${attr.attrTypeName} eq "TIMESTAMP")
+      // result.set${attr.javaPropertyNameBig}(((TIMESTAMP)attr[${attr.attrNoIndex}]).timestampValue()); // ${attr.attrName}
+      result.set${attr.javaPropertyNameBig}((Timestamp)attr[${attr.attrNoIndex}]); // ${attr.attrName}
+#elseif (${attr.attrTypeName} eq "CLOB")
+      result.set${attr.javaPropertyNameBig}(((CLOB)attr[${attr.attrNoIndex}]).stringValue()); // ${attr.attrName}
+#elseif (${attr.javaDataType} eq "Integer")
+      result.set${attr.javaPropertyNameBig}(((BigDecimal) attr[${attr.attrNoIndex}]).intValue()); // ${attr.attrName}
+#else
+      result.set${attr.javaPropertyNameBig}((${attr.javaDataType})attr[${attr.attrNoIndex}]); // ${attr.attrName}
+#end
+#end
+
+    return result;
+  }
+
+  public static List<${className}> getObjectList(ARRAY array) throws SQLException {
+    List<${className}> result = new ArrayList<${className}>();
+    ResultSet rs = null;
+
+    try {
+      rs = array.getResultSet();
+      while (rs.next()) {
+        result.add(${className}Converter.getObject((STRUCT)rs.getObject(2)));
+      }
+    } finally {
+      if (rs != null) {
+        rs.close();
+      }
+    }
+
+    return result;
+  }
+
+}
