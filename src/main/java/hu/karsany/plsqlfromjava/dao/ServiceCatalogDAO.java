@@ -24,8 +24,7 @@ public class ServiceCatalogDAO {
     public List<String> getServicePackages() {
         final String query = "SELECT o.object_name\n" +
                 "FROM   user_objects o\n" +
-                "WHERE  o.object_type = 'PACKAGE'\n" +
-                "AND    o.object_name LIKE '%_SERVICE'";
+                "WHERE  o.object_type = 'PACKAGE'";
 
         List<String> ret = jdbcTemplate.query(query, new RowMapper<String>() {
             @Override

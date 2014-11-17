@@ -27,11 +27,14 @@ public class ServiceGenerator {
 
             for (String s : servicePackages) {
 
-                List<Procedure> packageServiceProcedures = serviceCatalogDAO.getPackageServiceProcedures(s);
+                ServiceCatalogDAO serviceCatalogDAO2 = new ServiceCatalogDAO(oracleDataSource);
+                List<Procedure> packageServiceProcedures = serviceCatalogDAO2.getPackageServiceProcedures(s);
 
                 VelocityRenderer velocityRenderer = new VelocityRenderer("serviceclass.vm");
 
                 String className = StringHelper.toCamelCase(s);
+
+                System.out.println(className);
 
                 velocityRenderer.put("className", className);
                 velocityRenderer.put("service", packageServiceProcedures);
@@ -44,6 +47,7 @@ public class ServiceGenerator {
             }
 
         } catch (Exception e) {
+            System.err.println(e);
         }
     }
 }

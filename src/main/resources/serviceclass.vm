@@ -32,6 +32,7 @@ public class ${className} {
                 .p_${arg.javaPropertyName}(${arg.javaPropertyName})
 #end#end            );
 
+#if ( $proc.hasArguments )
 #foreach( $arg in $proc.argumentList )
 #if( $arg.outParam )
 #if( $arg.isList() == true )
@@ -39,6 +40,7 @@ public class ${className} {
         ${arg.javaPropertyName}.addAll(s.get${arg.javaPropertyNameBig}());
 #else
         ${arg.javaPropertyName}.refreshObject(s.get${arg.javaPropertyNameBig}());
+#end
 #end
 #end
 #end

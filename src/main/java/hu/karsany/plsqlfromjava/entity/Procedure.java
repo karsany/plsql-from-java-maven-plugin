@@ -91,12 +91,14 @@ public class Procedure {
         return StringHelper.toCamelCase(this.getObjectName() + "_" + this.getProcedureName() + "_" + this.getOverload());
     }
 
-    public void getReturnJavaType() {
+    public String getReturnJavaType() {
         if (!methodType.equals("FUNCTION")) {
             throw new RuntimeException("Csak fuggvenyek eseteben ertelmezett.");
         }
-        for (ProcedureArgument argument : argumentList) {
-            argumentList.get(0).getJavaDataType();
+        if (hasArguments()) {
+            return argumentList.get(0).getJavaDataType();
+        } else {
+            return "void";
         }
     }
 
@@ -106,5 +108,9 @@ public class Procedure {
 
     public void setPldoc(String pldoc) {
         this.pldoc = pldoc;
+    }
+
+    public boolean hasArguments() {
+        return this.argumentList != null && this.argumentList.size() > 0;
     }
 }
