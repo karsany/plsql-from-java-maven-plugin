@@ -10,6 +10,10 @@ import ${procPackage}.${proc.storedProcedureClassName};
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.Timestamp;
+import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 

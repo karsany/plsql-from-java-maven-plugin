@@ -39,11 +39,11 @@ public final class ${className}Converter {
 #elseif (${attr.attrTypeName} eq "TIMESTAMP")
     struct.add(${attr.attrNoIndex}, new TIMESTAMP(${smallClassName}.get${attr.javaPropertyNameBig}())); // ${attr.attrName}
 #elseif (${attr.attrTypeName} eq "CLOB")
-    CLOB cl = CLOB.createTemporary(connection, false, CLOB.DURATION_SESSION); // ${attr.attrName}
-    cl.open(CLOB.MODE_READWRITE); // ${attr.attrName}
-    cl.setString(1, ${smallClassName}.get${attr.javaPropertyNameBig}()); // ${attr.attrName}
-    cl.close(); // ${attr.attrName}
-    struct.add(${attr.attrNoIndex}, cl); // ${attr.attrName}
+    CLOB cl${attr.javaPropertyNameBig} = CLOB.createTemporary(connection, false, CLOB.DURATION_SESSION); // ${attr.attrName}
+    cl${attr.javaPropertyNameBig}.open(CLOB.MODE_READWRITE); // ${attr.attrName}
+    cl${attr.javaPropertyNameBig}.setString(1, ${smallClassName}.get${attr.javaPropertyNameBig}()); // ${attr.attrName}
+    cl${attr.javaPropertyNameBig}.close(); // ${attr.attrName}
+    struct.add(${attr.attrNoIndex}, cl${attr.javaPropertyNameBig}); // ${attr.attrName}
 #else
     struct.add(${attr.attrNoIndex}, ${smallClassName}.get${attr.javaPropertyNameBig}()); // ${attr.attrName}
 #end

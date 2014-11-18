@@ -100,7 +100,9 @@ public class ${className} implements StoredProcedure {
 #elseif($attr.dataType == "TABLE")
     this.${attr.javaPropertyName} = ${attr.underlyingTypeName}Converter.getObjectList((ARRAY)ocs.getObject(${attr.sequence})); // ${attr.argumentName}
 #elseif($attr.javaDataType == "Integer")
-        this.${attr.javaPropertyName} = ocs.getInt(${attr.sequence}); // ${attr.argumentName}
+    this.${attr.javaPropertyName} = ocs.getInt(${attr.sequence}); // ${attr.argumentName}
+#elseif($attr.javaDataType == "ResultSet")
+    this.${attr.javaPropertyName} = ocs.getCursor(${attr.sequence}); // ${attr.argumentName}
 #else
     this.${attr.javaPropertyName} = ocs.get${attr.javaDataType}(${attr.sequence}); // ${attr.argumentName}
 #end

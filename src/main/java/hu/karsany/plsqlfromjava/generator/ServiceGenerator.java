@@ -21,14 +21,11 @@ public class ServiceGenerator {
             OracleDataSource oracleDataSource = new OracleDataSource();
             oracleDataSource.setURL(settings.getJdbcUrl());
 
-            ServiceCatalogDAO serviceCatalogDAO = new ServiceCatalogDAO(oracleDataSource);
-
-            List<String> servicePackages = serviceCatalogDAO.getServicePackages();
+            List<String> servicePackages = new ServiceCatalogDAO(oracleDataSource).getServicePackages();
 
             for (String s : servicePackages) {
 
-                ServiceCatalogDAO serviceCatalogDAO2 = new ServiceCatalogDAO(oracleDataSource);
-                List<Procedure> packageServiceProcedures = serviceCatalogDAO2.getPackageServiceProcedures(s);
+                List<Procedure> packageServiceProcedures = new ServiceCatalogDAO(oracleDataSource).getPackageServiceProcedures(s);
 
                 VelocityRenderer velocityRenderer = new VelocityRenderer("serviceclass.vm");
 
@@ -47,7 +44,7 @@ public class ServiceGenerator {
             }
 
         } catch (Exception e) {
-            System.err.println(e);
+            throw new RuntimeException(e);
         }
     }
 }

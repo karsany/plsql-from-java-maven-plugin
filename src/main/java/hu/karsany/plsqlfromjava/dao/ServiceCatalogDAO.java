@@ -47,7 +47,8 @@ public class ServiceCatalogDAO {
                 "        AND    a.package_name = t.object_name\n" +
                 "        AND    nvl(a.overload, 0) = nvl(t.overload, 0)\n" +
                 "        AND    a.argument_name IS NULL\n" +
-                "        AND    a.data_level = 0) proc_or_func\n" +
+                "        AND    a.data_level = 0" +
+                "        And a.data_type is not null) proc_or_func\n" +
                 "FROM   user_procedures t\n" +
                 "WHERE  procedure_name IS NOT NULL\n" +
                 "AND    object_type = 'PACKAGE'\n" +

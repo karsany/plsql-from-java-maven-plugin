@@ -99,7 +99,8 @@ public class ProcedureCatalogDAO {
                         "          And a.package_name = t.object_name\n" +
                         "          And nvl(a.overload,'##NVL##') = nvl(t.overload,'##NVL##')\n" +
                         "          And a.argument_name Is Null\n" +
-                        "          And a.data_level = 0) proc_or_func\n" +
+                        "          And a.data_level = 0" +
+                        "          And a.data_type is not null) proc_or_func\n" +
                         "  From user_procedures t\n" +
                         " Where procedure_name Is Not Null\n" +
                         "   And object_type = 'PACKAGE'" +
