@@ -49,7 +49,7 @@ public class ${className} implements StoredProcedure {
 #end
 
   public String getCallStatement() {
-    return "{ CALL #if(${procedure.methodType} eq "FUNCTION")? = #end${procedure.objectName}.${procedure.procedureName} ("
+    return "{ CALL #if(${procedure.methodType} eq "FUNCTION")? := #end${procedure.objectName}.${procedure.procedureName} ("
 #set($cnt=0)
 #foreach ( $attr in $par )
 #if( ($attr.argumentName) )

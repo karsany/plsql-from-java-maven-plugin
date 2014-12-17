@@ -1,7 +1,7 @@
 plsql-from-java-maven-plugin
 ============================
 
-Java code generation for calling plsql
+Java source code generation for calling plsql.
 
 Installation
 ------------
