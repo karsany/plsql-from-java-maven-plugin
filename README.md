@@ -15,7 +15,13 @@ Installation
 
 3. Clone this repo
 4. Run `mvn install` from the repository's root directory
+5. Add the following lines to maven's settings.xml:
 
+        <settings>
+            <pluginGroups>
+                <pluginGroup>hu.karsany.plsql.plugins</pluginGroup>
+            </pluginGroups>
+        </settings>
 Usage
 -----
 
