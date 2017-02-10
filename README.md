@@ -1,3 +1,7 @@
+DISCONTINUED - successor project is OBridge - https://github.com/karsany/obridge
+============================
+
+
 plsql-from-java-maven-plugin
 ============================
 
